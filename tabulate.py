@@ -199,6 +199,11 @@ def _html_row_with_attrs(celltag, unsafe, cell_values, colwidths, colaligns):
         ]
     rowhtml = "<tr>{}</tr>".format("".join(values_with_attrs).rstrip())
     if celltag == "th":  # it's a header row, create a new table header
+        values_with_attrs = [
+            "<{0}{1}>{2}</{0}>".format(celltag, alignment.get("left", ""), htmlescape(c))
+            for c, a in zip(cell_values, colaligns)
+        ]
+        rowhtml = "<tr>{}</tr>".format("".join(values_with_attrs).rstrip())
         rowhtml = r"<table border=\"1\">\n<thead>\n{}\n</thead>\n<tbody>".format(rowhtml)
     return rowhtml
 
