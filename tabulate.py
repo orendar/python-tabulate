@@ -204,7 +204,7 @@ def _html_row_with_attrs(celltag, unsafe, cell_values, colwidths, colaligns):
             for c, a in zip(cell_values, colaligns)
         ]
         rowhtml = "<tr>{}</tr>".format("".join(values_with_attrs).rstrip())
-        rowhtml = r"<table border=\"1\">\n<thead>\n{}\n</thead>\n<tbody>".format(rowhtml)
+        rowhtml = r"<table border=\"1\"><thead>{}</thead><tbody>".format(rowhtml)
     return rowhtml
 
 
