@@ -184,10 +184,8 @@ def _html_begin_table_without_header(colwidths_ignore, colaligns_ignore):
 
 def _html_row_with_attrs(celltag, unsafe, cell_values, colwidths, colaligns):
     alignment = {
-        "left": ' style="dir: auto"',
-        "right": ' style="text-align: right; dir: auto"',
-        "center": ' style="text-align: center; dir: auto"',
-        "decimal": ' style="text-align: right; dir: auto"',
+        "left": f' style="direction:ltr"',
+        "right": f' style="text-align:right;direction:rtl"',
     }
     if unsafe:
         values_with_attrs = [
@@ -201,7 +199,7 @@ def _html_row_with_attrs(celltag, unsafe, cell_values, colwidths, colaligns):
         ]
     rowhtml = "<tr>{}</tr>".format("".join(values_with_attrs).rstrip())
     if celltag == "th":  # it's a header row, create a new table header
-        rowhtml = "<table>\n<thead>\n{}\n</thead>\n<tbody>".format(rowhtml)
+        rowhtml = r"<table border=\"1\">\n<thead>\n{}\n</thead>\n<tbody>".format(rowhtml)
     return rowhtml
 
 
