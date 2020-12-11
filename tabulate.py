@@ -9,6 +9,10 @@ from platform import python_version_tuple
 import re
 import math
 
+HTML_ALIGNMENT = {
+    "left": f' style="direction:ltr"',
+    "right": f' style="text-align:right;direction:rtl"',
+}
 
 if python_version_tuple() >= ("3", "3", "0"):
     from collections.abc import Iterable
@@ -183,24 +187,20 @@ def _html_begin_table_without_header(colwidths_ignore, colaligns_ignore):
 
 
 def _html_row_with_attrs(celltag, unsafe, cell_values, colwidths, colaligns):
-    alignment = {
-        "left": f' style="direction:ltr"',
-        "right": f' style="text-align:right;direction:rtl"',
-    }
     if unsafe:
         values_with_attrs = [
-            "<{0}{1}>{2}</{0}>".format(celltag, alignment.get(a, ""), c)
+            "<{0}{1}>{2}</{0}>".format(celltag, HTML_ALIGNMENT.get(a, ""), c)
             for c, a in zip(cell_values, colaligns)
         ]
     else:
         values_with_attrs = [
-            "<{0}{1}>{2}</{0}>".format(celltag, alignment.get(a, ""), htmlescape(c))
+            "<{0}{1}>{2}</{0}>".format(celltag, HTML_ALIGNMENT.get(a, ""), htmlescape(c))
             for c, a in zip(cell_values, colaligns)
         ]
     rowhtml = "<tr>{}</tr>".format("".join(values_with_attrs).rstrip())
     if celltag == "th":  # it's a header row, create a new table header
         values_with_attrs = [
-            "<{0}{1}>{2}</{0}>".format(celltag, alignment.get("left", ""), htmlescape(c))
+            "<{0}{1}>{2}</{0}>".format(celltag, HTML_ALIGNMENT.get("left", ""), htmlescape(c))
             for c, a in zip(cell_values, colaligns)
         ]
         rowhtml = "<tr>{}</tr>".format("".join(values_with_attrs).rstrip())
@@ -1541,8 +1541,16 @@ def tabulate(
     if not isinstance(tablefmt, TableFormat):
         tablefmt = _table_formats.get(tablefmt, _table_formats["simple"])
 
-    return _format_table(tablefmt, headers, rows, minwidths, aligns, is_multiline)
+    formatted_table = _format_table(tablefmt, headers, rows, minwidths, aligns, is_multiline)
+    return fix_html(formatted_table, colalign)
 
+
+def fix_html(html, colalign):
+    html = html.replace('</td></tr>\n', '')
+    s1 = f'''<tr><td{HTML_ALIGNMENT[colalign[0]]}>{' ' * 606}</td><td{HTML_ALIGNMENT[colalign[1]]}>'''
+    s2 = ''
+    html = html.replace(s1, s2)
+    return html
 
 def _expand_numparse(disable_numparse, column_count):
     """
